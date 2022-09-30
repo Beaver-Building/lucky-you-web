@@ -6,6 +6,7 @@
     "name": "Lucky You",
     "button": {
       "selectImageFolder": "Select images",
+      "selectXlsx": "Select .xlsx file",
       "start": "Start",
       "stop": "Stop",
       "readingImage": "Reading image...",

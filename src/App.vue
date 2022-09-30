@@ -81,6 +81,17 @@
           <el-button :disabled="rolling" type="text">{{ $t('luckyYou.button.selectImageFolder') }}</el-button>
           <div slot="tip" class="el-upload__tip">{{ $t('luckyYou.text.imageSelectionTip') }}</div>
         </el-upload>
+        <el-upload
+          action="https://jsonplaceholder.typicode.com/posts/"
+          multiple
+          :http-request="readXlsxFile"
+          :on-success="readXlsxFileDone"
+          :show-file-list="false"
+          :file-list="fileList"
+          accept=".readXlsxFile"
+        >
+          <el-button :disabled="rolling" type="text">{{ $t('luckyYou.button.selectXlsx') }}</el-button>
+        </el-upload>
       </el-col>
       <el-col :span="4">
         <div class="item"></div>
@@ -397,6 +408,61 @@ export default {
         uri: b64,
         name: this.shortenImageName(file.name)
       });
+    },
+    const reader = require('xlsx')
+
+    async readXlsxFile(arg) {
+        const file = reader.readFile(arg.file);
+        this.reset();
+
+        this.imageUrl = "/casino.png"
+        this.btnType = ""
+        this.readyForRoll = false
+        this.startBtnText = this.$t("luckyYou.button.readingXlsx")
+        const templateProfile = ""
+        const templatePath = ""
+        if (file.SheetNames.length != 1){
+            return;
+            // throw err that the xlsx import can not have multi sheet and no empty
+        }
+        const temp = reader.utils.sheet_to_json(
+            file.Sheets[file.SheetNames[i]])
+        temp.forEach((res) => {
+            this.images.push({
+                path: templatePath,
+                uri: templateProfile,
+                name: res.name
+            })
+        });
+    },
+    readImageFileDone(resp, file, fileList) {
+      // if file list has only 1 image, report error
+      if (fileList && fileList.length <= 1) {
+        this.images = [];
+        this.startBtnText = this.$t("luckyYou.button.start");
+        this.$message({
+          duration: 2000,
+          type: "error",
+          message: this.$t("luckyYou.message.mustGreaterThanOneImage")
+        });
+        return;
+      }
+      // current file is the last file in file list, then all the files uploaded done
+      if (file.name === fileList[fileList.length - 1].name) {
+        // reload config items
+        this.loadConfig();
+        this.btnType = "success";
+        this.startBtnText = this.$t("luckyYou.button.start");
+        this.readyForRoll = true;
+        this.imageUrl = "/casino.png";
+        this.$message({
+          duration: 1000,
+          type: "success",
+          message: this.$t("luckyYou.message.readDone").format(
+            this.images.length
+          )
+        });
+      }
     },
     reset() {
       this.imageUrl = "/casino.png";

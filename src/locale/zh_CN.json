@@ -6,6 +6,7 @@
     "name": "Lucky You",
     "button": {
       "selectImageFolder": "选择图片",
+      "selectXlsx": "选择 .xlsx 文件",
       "start": "开始",
       "stop": "停止",
       "readingImage": "图片读取中...",
