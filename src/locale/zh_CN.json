@@ -39,6 +39,7 @@
     },
     "message": {
       "noImage": "未找到图片文件",
+      "xlsxInputRule":"请上传一个 .xlsx 文件",
       "failedToReadImage": "读取图片失败,请使用 jpg 或 png 格式",
       "readDone": "已成功读取 {0} 个图片，你现在可以点击开始按钮啦~",
       "commonError": "出错啦 :(",

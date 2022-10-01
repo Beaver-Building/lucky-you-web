@@ -39,6 +39,7 @@
     },
     "message": {
       "noImage": "Image file not found",
+      "xlsxInputRule":"Please upload a xlsx file",
       "failedToReadImage": "Failed to read image file, please use .jpg or .png format",
       "readDone": "{0} image files read successfully, You can now click Start button~",
       "commonError": "Error happened :(",

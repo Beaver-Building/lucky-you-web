@@ -64,32 +64,16 @@
 
     <el-row justify="center" class="btn-row">
       <el-col :span="12" :offset="6">
-        <el-button
-          :disabled="!readyForRoll"
-          :type="btnType"
-          @click="startRoll"
-        >{{ startBtnText }} ({{ images.length }})</el-button>
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          multiple
-          :http-request="readImageFile"
-          :on-success="readImageFileDone"
-          :show-file-list="false"
-          :file-list="fileList"
-          accept=".jpg, .jpeg, .png, .gif"
-        >
+        <el-button :disabled="!readyForRoll" :type="btnType" @click="startRoll">{{ startBtnText }} ({{ images.length }})
+        </el-button>
+        <el-upload action="https://jsonplaceholder.typicode.com/posts/" multiple :http-request="readImageFile"
+          :on-success="readImageFileDone" :show-file-list="false" :file-list="fileList"
+          accept=".jpg, .jpeg, .png, .gif">
           <el-button :disabled="rolling" type="text">{{ $t('luckyYou.button.selectImageFolder') }}</el-button>
           <div slot="tip" class="el-upload__tip">{{ $t('luckyYou.text.imageSelectionTip') }}</div>
         </el-upload>
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          multiple
-          :http-request="readXlsxFile"
-          :on-success="readXlsxFileDone"
-          :show-file-list="false"
-          :file-list="fileList"
-          accept=".readXlsxFile"
-        >
+        <el-upload action="https://jsonplaceholder.typicode.com/posts/" multiple :http-request="readXlsxFile"
+          :on-success="readXlsxFileDone" :show-file-list="false" :file-list="fileList" accept=".xlsx">
           <el-button :disabled="rolling" type="text">{{ $t('luckyYou.button.selectXlsx') }}</el-button>
         </el-upload>
       </el-col>
@@ -109,6 +93,7 @@ import DonateDialog from "./components/DonateDialog";
 import FooterComponent from "./components/FooterComponent";
 import SettingsDialog from "./components/SettingsDialog";
 import { Notification } from "element-ui";
+import * as readerx from "xlsx";
 
 export default {
   name: "App",
@@ -230,9 +215,9 @@ export default {
       // if the tips is default tip, then set the default tip in current lang
       if (
         this.selectedImageFileName ===
-          this.$t("luckyYou.text.defaultTips", "zh") ||
+        this.$t("luckyYou.text.defaultTips", "zh") ||
         this.selectedImageFileName ===
-          this.$t("luckyYou.text.defaultTips", "en")
+        this.$t("luckyYou.text.defaultTips", "en")
       ) {
         this.selectedImageFileName = this.$t("luckyYou.text.defaultTips");
       }
@@ -345,7 +330,7 @@ export default {
         type: "application/octet-binary"
       });
       var reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = function (evt) {
         var dataurl = evt.target.result;
         callback(dataurl.substr(dataurl.indexOf(",") + 1));
       };
@@ -409,41 +394,43 @@ export default {
         name: this.shortenImageName(file.name)
       });
     },
-    const reader = require('xlsx')
-
     async readXlsxFile(arg) {
-        const file = reader.readFile(arg.file);
-        this.reset();
+      console.log("1")
+      // stuck here
+      const file = readerx.readFile(arg.file);
+      console.log("2")
+      this.reset();
 
-        this.imageUrl = "/casino.png"
-        this.btnType = ""
-        this.readyForRoll = false
-        this.startBtnText = this.$t("luckyYou.button.readingXlsx")
-        const templateProfile = ""
-        const templatePath = ""
-        if (file.SheetNames.length != 1){
-            return;
-            // throw err that the xlsx import can not have multi sheet and no empty
-        }
-        const temp = reader.utils.sheet_to_json(
-            file.Sheets[file.SheetNames[i]])
-        temp.forEach((res) => {
-            this.images.push({
-                path: templatePath,
-                uri: templateProfile,
-                name: res.name
-            })
-        });
+      this.imageUrl = "/casino.png"
+      this.btnType = "";
+      this.readyForRoll = false
+      this.startBtnText = this.$t("luckyYou.button.readingXlsx")
+      const templateProfile = await this.convertFile2Image("/casino.png");
+      const templatePath = "/casino.png"
+      if (file.SheetNames.length != 1) {
+        return;
+        // throw err that the xlsx import can not have multi sheet and no empty
+      }
+      const temp = readerx.utils.sheet_to_json(
+        file.Sheets[file.SheetNames[0]])
+      temp.forEach((res) => {
+        this.images.push({
+          path: templatePath,
+          uri: templateProfile,
+          name: res.name
+        })
+      });
+      console.log(this.images)
     },
-    readImageFileDone(resp, file, fileList) {
+    readXlsxFileDone(resp, file, fileList) {
       // if file list has only 1 image, report error
-      if (fileList && fileList.length <= 1) {
+      if ((!fileList && fileList.length <= 0) || (fileList && fileList.length > 1)) {
         this.images = [];
         this.startBtnText = this.$t("luckyYou.button.start");
         this.$message({
           duration: 2000,
           type: "error",
-          message: this.$t("luckyYou.message.mustGreaterThanOneImage")
+          message: this.$t("luckyYou.message.xlsxInputRule")
         });
         return;
       }
@@ -520,6 +507,7 @@ export default {
   --img-bright: 100%;
   --bg-dialog: #fff;
 }
+
 html.dark-mode {
   --bg: #121212;
   --color: #b9b9b9;
@@ -530,6 +518,7 @@ html.dark-mode {
   --color-icon: currentColor;
   --bg-dialog: #333333;
 }
+
 html.light-mode {
   --bg: #fff;
   --color: black;
@@ -540,29 +529,36 @@ html.light-mode {
   --color-icon: currentColor;
   --bg-dialog: #fff;
 }
+
 button {
   color: var(--color-btn);
   background: var(--bg-btn);
 }
+
 img {
   filter: brightness(var(--img-bright));
 }
+
 #file-name-item {
   color: var(--color);
 }
+
 .el-dialog {
   background: var(--bg);
 }
+
 .vue-dark-mode {
   padding: 0px 0px;
   font-size: 14px;
 }
+
 html body {
   margin: 0;
   padding: 0;
   height: auto;
   background-color: var(--bg);
 }
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -571,6 +567,7 @@ html body {
   color: var(--color);
   background-size: cover;
 }
+
 #the-img {
   width: 300px;
   height: 300px;
@@ -580,12 +577,15 @@ html body {
   border: 2px #ec2d7a dashed;
   object-fit: cover;
 }
+
 #the-img:hover {
   border: 2px #207f4c dashed;
 }
+
 .name-row {
   margin-top: 0.5em;
 }
+
 .btn-row {
   margin-top: 0.5em;
 }
@@ -600,20 +600,24 @@ html body {
 .toolbar-row {
   margin-top: 0.5em;
 }
+
 .toolbar-btn {
   margin-left: 0.5em;
 }
+
 .toolbar-btn-status {
   display: block;
   font-size: x-small;
   font-weight: bold;
   color: #606266;
 }
+
 .toolbar-section {
   display: flex;
   justify-content: flex-end;
   padding-right: 1em;
 }
+
 .toolbar-btn-wrapper {
   margin-left: 0.5em;
   align-content: flex-end;
