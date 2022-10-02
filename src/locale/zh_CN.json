@@ -10,6 +10,7 @@
       "start": "开始",
       "stop": "停止",
       "readingImage": "图片读取中...",
+      "readingXlsx": "加载 Xlsx",
       "donate": "捐赠",
       "nextTime": "下次一定",
       "donated": "我已捐赠",

@@ -10,6 +10,7 @@
       "start": "Start",
       "stop": "Stop",
       "readingImage": "Reading image...",
+      "readingXlsx":"Loading Xlsx",
       "donate": "Donate",
       "nextTime": "Will do in next time",
       "donated": "I donated!",

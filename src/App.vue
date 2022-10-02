@@ -72,8 +72,8 @@
           <el-button :disabled="rolling" type="text">{{ $t('luckyYou.button.selectImageFolder') }}</el-button>
           <div slot="tip" class="el-upload__tip">{{ $t('luckyYou.text.imageSelectionTip') }}</div>
         </el-upload>
-        <el-upload action="https://jsonplaceholder.typicode.com/posts/" multiple :http-request="readXlsxFile"
-          :on-success="readXlsxFileDone" :show-file-list="false" :file-list="fileList" accept=".xlsx">
+        <el-upload action="https://jsonplaceholder.typicode.com/posts/" :http-request="readXlsxFile"
+          :on-success="readXlsxFileDone" accept=".xlsx">
           <el-button :disabled="rolling" type="text">{{ $t('luckyYou.button.selectXlsx') }}</el-button>
         </el-upload>
       </el-col>
@@ -93,7 +93,7 @@ import DonateDialog from "./components/DonateDialog";
 import FooterComponent from "./components/FooterComponent";
 import SettingsDialog from "./components/SettingsDialog";
 import { Notification } from "element-ui";
-import * as readerx from "xlsx";
+import { read, utils } from "xlsx";
 
 export default {
   name: "App",
@@ -394,32 +394,40 @@ export default {
         name: this.shortenImageName(file.name)
       });
     },
+    async converXlsx2ArrayBuffer(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          resolve(e.target.result);
+        };
+        reader.readAsArrayBuffer(file);
+        reader.onerror = err => {
+          reject(err);
+        };
+      });
+    },
     async readXlsxFile(arg) {
-      console.log("1")
       // stuck here
-      const file = readerx.readFile(arg.file);
-      console.log("2")
+      
+      const file = await this.converXlsx2ArrayBuffer(arg.file)
+      const wb = read(file);
+      const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      console.log(data);
       this.reset();
-
+      console.log("here1")
       this.imageUrl = "/casino.png"
       this.btnType = "";
       this.readyForRoll = false
       this.startBtnText = this.$t("luckyYou.button.readingXlsx")
-      const templateProfile = await this.convertFile2Image("/casino.png");
       const templatePath = "/casino.png"
-      if (file.SheetNames.length != 1) {
-        return;
-        // throw err that the xlsx import can not have multi sheet and no empty
-      }
-      const temp = readerx.utils.sheet_to_json(
-        file.Sheets[file.SheetNames[0]])
-      temp.forEach((res) => {
+      data.forEach((res) => {
         this.images.push({
           path: templatePath,
-          uri: templateProfile,
-          name: res.name
+          uri: "/casino.png",
+          name: res.Name
         })
       });
+      console.log("here2")
       console.log(this.images)
     },
     readXlsxFileDone(resp, file, fileList) {
