@@ -315,7 +315,9 @@ export default {
         .slice(0, this.prevIdx)
         .concat(this.images.slice(this.prevIdx + 1, this.images.length));
       this.idx = Math.min(this.prevIdx, temp.length - 1);
+      // console.log(this.images)
       this.images = temp;
+      // console.log(this.images)
     },
     startRoll() {
       if (this.rolling) {
